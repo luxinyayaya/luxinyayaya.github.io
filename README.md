@@ -1,0 +1,2 @@
+# luxinyayaya.github.io
+blog
