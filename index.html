@@ -9,7 +9,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Favicon removed as requested -->
     <link rel="stylesheet" type="text/css" href="stylesheet.css">
-    
+
+    <script>
+      let isAIImage = true;
+
+      function flipImage() {
+        const img = document.getElementById('profileImage');
+        img.style.transform = 'rotateY(90deg)';
+
+        setTimeout(() => {
+          if (isAIImage) {
+            img.src = 'assets/image.png';
+          } else {
+            img.src = 'assets/image-ai.png';
+          }
+          isAIImage = !isAIImage;
+          img.style.transform = 'rotateY(0deg)';
+        }, 150);
+      }
+    </script>
+
   </head>
 
   <body>
@@ -36,7 +55,7 @@
                 </p>
               </td>
               <td style="padding:2.5%;width:37%;max-width:37%">
-                <a href="assets/image.png"><img style="width:70%;max-width:100%;object-fit: cover;" alt="profile photo" src="assets/image.png" class="hoverZoomLink"></a>
+                <img id="profileImage" style="width:70%;max-width:100%;object-fit: cover;cursor:pointer;" alt="profile photo" src="assets/image-ai.png" class="hoverZoomLink" onclick="flipImage()">
               </td>
             </tr>
           </tbody></table>
@@ -62,6 +81,32 @@
               <br>
               <em>Under Review</em>
               <br>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:8px;width:100%;vertical-align:middle" class="paper-card">
+              <span class="papertitle">Perplexity-aware Correction for Robust Alignment with Noisy Preferences</span>
+              <br>
+              <class="author"> <span style="font-family: 'Arial Black'">Keyi Kong*</span>, Xilie Xu*, Di Wang, Jingfeng Zhang, Mohan Kankanhalli
+              </span>
+              <br>
+              <em>Accepted by NeurIPS 2024</em>
+              <br>
+              <a href="https://openreview.net/attachment?id=OUXnnPJzXJ&name=pdf">Paper</a> / <a href="https://github.com/luxinyayaya/PerpCorrect">Code</a>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:8px;width:100%;vertical-align:middle" class="paper-card">
+              <span class="papertitle">An LLM can Fool Itself: A Prompt-Based Adversarial Attack</span>
+              <br>
+              <class="author"> Xilie Xu*, <span style="font-family: 'Arial Black'">Keyi Kong*</span>, Ning Liu, Lizhen Cui, Di Wang, Jingfeng Zhang, Mohan Kankanhalli
+              </span>
+              <br>
+              <em>Accepted by ICLR 2024</em>
+              <br>
+              <a href="https://openreview.net/pdf?id=VVgGbB9TNV">Paper</a> / <a href="https://github.com/GodXuxilie/PromptAttack">Code</a>
             </td>
           </tr>
 
@@ -105,11 +150,12 @@
             <td style="padding:8px;width:100%;vertical-align:middle" class="paper-card">
               <span class="papertitle">An End-to-End Adaptable Prototypical Framework for Explainable Fine-Grained Visual Question Answering</span>
               <br>
-              <class="author"> Xingjian Diao, Weiyi Wu,  <span style="font-family: 'Arial Black'">Keyi Kong</span>, Peijun Qing, Xinwen Xu, Ming Cheng, Soroush Vosoughi, Jiang Gui
+              <class="author"> Xingjian Diao*, Weiyi Wu*,  <span style="font-family: 'Arial Black'">Keyi Kong</span>, Peijun Qing, Xinwen Xu, Ming Cheng, Soroush Vosoughi, Jiang Gui
               </span>
               <br>
               <em>Accepted by EMNLP 2025</em>
               <br>
+              <a href="https://arxiv.org/abs/2509.16680">Paper</a>
             </td>
           </tr>
 
@@ -122,6 +168,7 @@
               <br>
               <em>Accepted by IJCAI 2025</em>
               <br>
+              <a href="https://www.ijcai.org/proceedings/2025/1107">Paper</a>
             </td>
           </tr>
 
@@ -134,32 +181,6 @@
               <br>
               <em>Under Review</em>
               <br>
-            </td>
-          </tr>
-
-          <tr>
-            <td style="padding:8px;width:100%;vertical-align:middle" class="paper-card">
-              <span class="papertitle">Perplexity-aware Correction for Robust Alignment with Noisy Preferences</span>
-              <br>
-              <class="author"> <span style="font-family: 'Arial Black'">Keyi Kong*</span>, Xilie Xu*, Di Wang, Jingfeng Zhang, Mohan Kankanhalli
-              </span>
-              <br>
-              <em>Accepted by NeurIPS 2024</em>
-              <br>
-              <a href="https://openreview.net/attachment?id=OUXnnPJzXJ&name=pdf">Paper</a> / <a href="https://github.com/luxinyayaya/PerpCorrect">Code</a>
-            </td>
-          </tr>
-
-          <tr>
-            <td style="padding:8px;width:100%;vertical-align:middle" class="paper-card">
-              <span class="papertitle">An LLM can Fool Itself: A Prompt-Based Adversarial Attack</span>
-              <br>
-              <class="author"> Xilie Xu*, <span style="font-family: 'Arial Black'">Keyi Kong*</span>, Ning Liu, Lizhen Cui, Di Wang, Jingfeng Zhang, Mohan Kankanhalli
-              </span>
-              <br>
-              <em>Accepted by ICLR 2024</em>
-              <br>
-              <a href="https://openreview.net/pdf?id=VVgGbB9TNV">Paper</a> / <a href="https://github.com/GodXuxilie/PromptAttack">Code</a>
             </td>
           </tr>
 
@@ -212,7 +233,7 @@
               <td style="padding:16px;width:100%;vertical-align:middle">
                 <h2>Academic Services</h2>
                 <ul>
-                  <li style="margin-bottom: 4px;"> <strong>Conference Reviewer:</strong> AAAI2026, ACL2025, AISTATS2025, AISTATS2026, EMNLP2025, ICLR2025, ICML2025, NeurIPS2024, NeurIPS2025</li>
+                  <li style="margin-bottom: 4px;"> <strong>Conference Reviewer:</strong> AAAI (2026), ACL (2025), AISTATS (2025-2026), EMNLP (2025), ICLR (2025-2026), ICML (2025), NeurIPS (2024-2025)</li>
                 </ul>
               </td>
             </tr>
