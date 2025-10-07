@@ -28,7 +28,111 @@
           }
           isAIImage = !isAIImage;
           img.style.transform = 'rotateY(0deg)';
+          img.loading = 'lazy';
         }, 150);
+      }
+
+      // Back to top functionality
+      function scrollToTop() {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      }
+
+      // Navigation functionality
+      function updateActiveSection() {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const documentHeight = document.documentElement.scrollHeight;
+        const windowHeight = window.innerHeight;
+        const sections = ['top', 'publications', 'experience', 'education', 'awards', 'services'];
+        const navDots = document.querySelectorAll('.nav-dot');
+
+        let activeSection = 'top';
+
+        // Check if we're at the bottom of the page
+        if (scrollTop + windowHeight >= documentHeight - 10) {
+          activeSection = 'services';
+        } else if (scrollTop > 100) {
+          sections.slice(1).forEach(sectionId => {
+            const element = document.getElementById(sectionId);
+            if (element) {
+              const rect = element.getBoundingClientRect();
+              if (rect.top <= window.innerHeight / 2) {
+                activeSection = sectionId;
+              }
+            }
+          });
+        }
+
+        navDots.forEach(dot => {
+          dot.classList.remove('active');
+          if (dot.dataset.section === activeSection) {
+            dot.classList.add('active');
+          }
+        });
+      }
+
+      // Show/hide navigation elements
+      window.addEventListener('scroll', function() {
+        const backToTopBtn = document.getElementById('backToTop');
+        const progressNav = document.getElementById('progressNav');
+
+        if (window.pageYOffset > 300) {
+          backToTopBtn.style.opacity = '1';
+          backToTopBtn.style.visibility = 'visible';
+        } else {
+          backToTopBtn.style.opacity = '0';
+          backToTopBtn.style.visibility = 'hidden';
+        }
+
+        if (window.pageYOffset > 100) {
+          progressNav.style.opacity = '1';
+          progressNav.style.visibility = 'visible';
+        } else {
+          progressNav.style.opacity = '0';
+          progressNav.style.visibility = 'hidden';
+        }
+
+        updateActiveSection();
+      });
+
+      // Navigation dot click handlers
+      document.addEventListener('DOMContentLoaded', function() {
+        const navDots = document.querySelectorAll('.nav-dot');
+
+        navDots.forEach(dot => {
+          dot.addEventListener('click', function() {
+            const section = this.dataset.section;
+
+            if (section === 'top') {
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+              const element = document.getElementById(section);
+              if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }
+            }
+          });
+        });
+      });
+
+      // Toggle publications function
+      function togglePublications() {
+        const extraPublications = document.getElementById('extraPublications');
+        const toggleBtn = document.getElementById('togglePublications');
+        const toggleText = toggleBtn.querySelector('.toggle-text');
+        const toggleIcon = toggleBtn.querySelector('.toggle-icon');
+
+        if (extraPublications.style.display === 'none' || extraPublications.style.display === '') {
+          extraPublications.style.display = 'block';
+          toggleText.textContent = 'Show Less';
+          toggleIcon.style.transform = 'rotate(180deg)';
+        } else {
+          extraPublications.style.display = 'none';
+          toggleText.textContent = 'Show More';
+          toggleIcon.style.transform = 'rotate(0deg)';
+        }
       }
     </script>
 
@@ -51,24 +155,32 @@
                 <span style="color: red;"><strong>I am currently seeking PhD positions for 2026 fall! </strong></span> If my background resonates with your work, I would welcome the opportunity to connect.
                 </p>
                 <p style="text-align:center">
-                  <a href="mailto:luxinyayaya@foxmail.com">Email: luxinyayaya@foxmail</a> &nbsp;/&nbsp;
+                  <a href="mailto:luxinyayaya@foxmail.com">Email</a> &nbsp;/&nbsp;
                   <a href="assets/keyi-en-short.pdf">CV</a> &nbsp;/&nbsp;
                   <a href="https://scholar.google.com/citations?&user=E_jCf7cAAAAJ">Google Scholar</a> &nbsp;/&nbsp;
                   <a href="https://github.com/luxinyayaya">Github</a>
                 </p>
               </td>
               <td style="padding:3% 3% 3% 1.5%;width:40%;max-width:40%;text-align:center;">
-                <img id="profileImage" style="width:75%;max-width:100%;object-fit: cover;cursor:pointer;" alt="profile photo" src="assets/image-ai.png" class="hoverZoomLink" onclick="flipImage()">
+                <img id="profileImage" style="width:75%;max-width:100%;object-fit: cover;cursor:pointer;" alt="profile photo" src="assets/image-ai.png" class="hoverZoomLink" onclick="flipImage()" loading="lazy">
               </td>
             </tr>
           </tbody></table>
-          
+
           <!-- Publications Section -->
           <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;"><tbody>
               <tr>
               <td style="padding:16px;width:100%;vertical-align:middle">
-                <h2>Recent Publications</h2>
-                <p style="margin-bottom:-20px;">* Equal contribution</p>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                  <h2 id="publications" style="margin: 0;">Publications</h2>
+                  <button id="togglePublications" class="toggle-btn" onclick="togglePublications()">
+                    <span class="toggle-text">Show More</span>
+                    <svg class="toggle-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </button>
+                </div>
+                <p style="margin-bottom: 10px;">* Equal contribution</p>
               </td>
             </tr>
           </tbody></table>
@@ -103,6 +215,11 @@
               <a href="https://openreview.net/pdf?id=VVgGbB9TNV">Paper</a> / <a href="https://github.com/GodXuxilie/PromptAttack">Code</a>
             </td>
           </tr>
+
+          </tbody></table>
+
+          <div id="extraPublications" class="extra-publications">
+          <table style="width:100%;border:0px;border-spacing:0px 15px;border-collapse:separate;margin-right:auto;margin-left:auto;"><tbody>
 
           <tr>
             <td style="padding:4px;width:100%;vertical-align:middle" class="paper-card">
@@ -174,12 +291,13 @@
           </tr>
 
           </tbody></table>
-          
+          </div>
+
           <!-- Experinence Section -->
           <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;"><tbody>
             <tr>
               <td style="padding:16px;width:100%;vertical-align:middle">
-                <h2>Experience</h2>
+                <h2 id="experience">Experience</h2>
                 <ul>
                   <li style="margin-bottom: 4px;"> <strong>2024.11 - 2025.08 :</strong> Research Intern, Baidu Search, under Dr. Xinyu Ma</li>
                   <li style="margin-bottom: 4px;"> <strong>2024.07 - 2024.09 :</strong> Research Intern, National University of Singapore, under Prof. Mohan Kankanhalli</li>
@@ -188,12 +306,26 @@
               </td>
             </tr>
           </tbody></table>
-          
+
+          <!-- Education Section -->
+          <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;"><tbody>
+            <tr>
+              <td style="padding:16px;width:100%;vertical-align:middle">
+                <h2 id="education">Education</h2>
+                <ul>
+                  <li style="margin-bottom: 8px;">
+                    <strong>2022.09 - 2026.06 (Expected):</strong> B.E. at <a href="https://www.sdu.edu.cn/">Shandong University</a>
+                  </li>
+                </ul>
+              </td>
+            </tr>
+          </tbody></table>
+
           <!-- Awards Section -->
           <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;"><tbody>
             <tr>
               <td style="padding:16px;width:100%;vertical-align:middle">
-                <h2>Selected Awards</h2>
+                <h2 id="awards">Selected Awards</h2>
                 <ul>
                     <li style="margin-bottom: 2px;"> 2023 ICPC Asia Hefei Regional Contest - <strong>Gold Medal</strong></li>
                     <li style="margin-bottom: 2px;"> 2024 Shandong Provincial Programming Contest - <strong>Champion (1st Place)</strong></li>
@@ -207,7 +339,7 @@
           <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;"><tbody>
             <tr>
               <td style="padding:16px;width:100%;vertical-align:middle">
-                <h2>Academic Services</h2>
+                <h2 id="services">Academic Services</h2>
                 <ul>
                   <li style="margin-bottom: 4px;"> <strong>Conference Reviewer:</strong> AAAI (2026), ACL (2025), AISTATS (2025-2026), EMNLP (2025), ICLR (2025-2026), ICML (2025), NeurIPS (2024-2025)</li>
                 </ul>
@@ -228,5 +360,42 @@
         </td>
       </tr>
     </tbody></table>
+
+    <!-- Progress Navigation Bar -->
+    <div id="progressNav" class="progress-nav">
+      <div class="nav-dots">
+        <div class="nav-dot" data-section="top" title="Top">
+          <div class="dot-indicator"></div>
+          <span class="dot-label">Top</span>
+        </div>
+        <div class="nav-dot" data-section="publications" title="Publications">
+          <div class="dot-indicator"></div>
+          <span class="dot-label">Publications</span>
+        </div>
+        <div class="nav-dot" data-section="experience" title="Experience">
+          <div class="dot-indicator"></div>
+          <span class="dot-label">Experience</span>
+        </div>
+        <div class="nav-dot" data-section="education" title="Education">
+          <div class="dot-indicator"></div>
+          <span class="dot-label">Education</span>
+        </div>
+        <div class="nav-dot" data-section="awards" title="Awards">
+          <div class="dot-indicator"></div>
+          <span class="dot-label">Awards</span>
+        </div>
+        <div class="nav-dot" data-section="services" title="Services">
+          <div class="dot-indicator"></div>
+          <span class="dot-label">Services</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Back to Top Button -->
+    <button id="backToTop" onclick="scrollToTop()" class="back-to-top">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 19V5M5 12L12 5L19 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
   </body>
 </html>
