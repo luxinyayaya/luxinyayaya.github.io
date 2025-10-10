@@ -32,13 +32,6 @@
         }, 150);
       }
 
-      // Back to top functionality
-      function scrollToTop() {
-        window.scrollTo({
-          top: 0,
-          behavior: 'smooth'
-        });
-      }
 
       // Navigation functionality
       function updateActiveSection() {
@@ -75,16 +68,7 @@
 
       // Show/hide navigation elements
       window.addEventListener('scroll', function() {
-        const backToTopBtn = document.getElementById('backToTop');
         const progressNav = document.getElementById('progressNav');
-
-        if (window.pageYOffset > 300) {
-          backToTopBtn.style.opacity = '1';
-          backToTopBtn.style.visibility = 'visible';
-        } else {
-          backToTopBtn.style.opacity = '0';
-          backToTopBtn.style.visibility = 'hidden';
-        }
 
         if (window.pageYOffset > 100) {
           progressNav.style.opacity = '1';
@@ -102,6 +86,7 @@
         const navDots = document.querySelectorAll('.nav-dot');
 
         navDots.forEach(dot => {
+          // Add click/touch event for navigation
           dot.addEventListener('click', function() {
             const section = this.dataset.section;
 
@@ -114,7 +99,33 @@
               }
             }
           });
+
+          // Add touch support for mobile
+          dot.addEventListener('touchstart', function(e) {
+            this.style.transform = 'scale(0.95)';
+          });
+
+          dot.addEventListener('touchend', function(e) {
+            this.style.transform = '';
+          });
         });
+
+        // Improve mobile scrolling performance
+        if (window.innerWidth <= 768) {
+          let ticking = false;
+
+          function updateNavigation() {
+            updateActiveSection();
+            ticking = false;
+          }
+
+          window.addEventListener('scroll', function() {
+            if (!ticking) {
+              requestAnimationFrame(updateNavigation);
+              ticking = true;
+            }
+          });
+        }
       });
 
       // Toggle publications function
@@ -391,11 +402,5 @@
       </div>
     </div>
 
-    <!-- Back to Top Button -->
-    <button id="backToTop" onclick="scrollToTop()" class="back-to-top">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12 19V5M5 12L12 5L19 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </button>
   </body>
 </html>
