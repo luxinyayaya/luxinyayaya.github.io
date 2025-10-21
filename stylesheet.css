@@ -99,12 +99,20 @@ h2:before {
     margin: 3px 0;
 }
 
+.my-name {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
+    font-weight: 400;
+    text-decoration: underline;
+    color: #6b7280;
+}
+
 .paper-card em {
     color: #9ca3af;
     font-style: italic;
     font-size: 13px;
     margin: 3px 0;
-    display: block;
+    display: inline;
+    margin-right: 8px;
 }
 
 .paper-card a {
@@ -112,19 +120,23 @@ h2:before {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
     font-weight: 500;
     text-decoration: none;
-    padding: 2px 6px;
-    border-radius: 4px;
     transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     font-size: 13px;
     position: relative;
-    overflow: hidden;
+}
+
+.paper-card a::before {
+    content: '[';
+    margin-right: 2px;
+}
+
+.paper-card a::after {
+    content: ']';
+    margin-left: 2px;
 }
 
 .paper-card a:hover {
-    background: rgba(79, 70, 229, 0.1);
     color: #3730a3;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(79, 70, 229, 0.15);
 }
 
 .name {
@@ -229,138 +241,6 @@ img:hover {
 }
 
 
-
-/* Smooth scrolling for anchor links */
-html {
-    scroll-behavior: smooth;
-}
-
-/* Progress Navigation Bar */
-.progress-nav {
-    position: fixed;
-    right: 30px;
-    top: 15%;
-    bottom: 15%;
-    width: 140px;
-    z-index: 999;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-
-.nav-dots {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: 100%;
-    padding: 20px 0;
-    margin-right: 20px;
-}
-
-.nav-dot {
-    position: relative;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    padding: 10px 18px 10px 10px;
-    border-radius: 28px;
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    margin-bottom: 0;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-    min-width: fit-content;
-    white-space: nowrap;
-}
-
-.dot-indicator {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: rgba(148, 163, 184, 0.7);
-    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    margin-right: 12px;
-    position: relative;
-    flex-shrink: 0;
-}
-
-.dot-indicator::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: rgba(99, 102, 241, 0.1);
-    opacity: 0;
-    transition: all 0.3s ease;
-}
-
-.dot-label {
-    font-size: 13px;
-    font-weight: 500;
-    color: rgba(71, 85, 105, 0.85);
-    white-space: nowrap;
-    opacity: 1;
-    transform: translateX(0);
-    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    font-family: 'Inter', sans-serif;
-    letter-spacing: -0.005em;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 120px;
-}
-
-.nav-dot:hover {
-    background: rgba(255, 255, 255, 0.22);
-    border-color: rgba(99, 102, 241, 0.35);
-    transform: translateX(-8px);
-    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.15), 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.nav-dot:hover .dot-indicator {
-    background: #6366f1;
-    transform: scale(1.2);
-    box-shadow: 0 0 8px rgba(99, 102, 241, 0.5);
-}
-
-.nav-dot:hover .dot-indicator::before {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1.2);
-}
-
-.nav-dot:hover .dot-label {
-    color: #4f46e5;
-    font-weight: 600;
-}
-
-.nav-dot.active {
-    background: rgba(255, 255, 255, 0.25);
-    border-color: rgba(99, 102, 241, 0.45);
-    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.2), 0 3px 10px rgba(0, 0, 0, 0.1);
-}
-
-.nav-dot.active .dot-indicator {
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-    transform: scale(1.3);
-    box-shadow: 0 0 10px rgba(99, 102, 241, 0.6);
-}
-
-.nav-dot.active .dot-indicator::before {
-    opacity: 1;
-    background: rgba(99, 102, 241, 0.2);
-    transform: translate(-50%, -50%) scale(1.2);
-}
-
-.nav-dot.active .dot-label {
-    color: #4f46e5;
-    font-weight: 600;
-}
 
 /* Mobile responsive */
 @media (max-width: 768px) {
@@ -482,45 +362,6 @@ html {
         font-size: 14px;
     }
 
-    /* Progress navigation mobile */
-    .progress-nav {
-        right: 15px;
-        top: 15%;
-        bottom: 15%;
-        width: 50px;
-    }
-
-    .nav-dots {
-        margin-right: 10px;
-        padding: 10px 0;
-    }
-
-    .dot-label {
-        display: none;
-    }
-
-    .nav-dot {
-        padding: 6px;
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 50%;
-        width: 20px;
-        height: 20px;
-        justify-content: center;
-        margin-bottom: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .nav-dot:hover {
-        transform: translateX(-3px);
-        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
-    }
-
-    .dot-indicator {
-        margin-right: 0;
-        width: 6px;
-        height: 6px;
-    }
-
     /* Toggle button mobile */
     .toggle-btn {
         font-size: 12px;
@@ -585,22 +426,6 @@ html {
     #profileImage {
         width: 70% !important;
         max-width: 180px !important;
-    }
-
-    .progress-nav {
-        right: 10px;
-        width: 40px;
-    }
-
-    .nav-dot {
-        width: 16px;
-        height: 16px;
-        margin-bottom: 6px;
-    }
-
-    .dot-indicator {
-        width: 5px;
-        height: 5px;
     }
 }
 

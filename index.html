@@ -33,101 +33,6 @@
       }
 
 
-      // Navigation functionality
-      function updateActiveSection() {
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        const documentHeight = document.documentElement.scrollHeight;
-        const windowHeight = window.innerHeight;
-        const sections = ['top', 'publications', 'experience', 'education', 'awards', 'services'];
-        const navDots = document.querySelectorAll('.nav-dot');
-
-        let activeSection = 'top';
-
-        // Check if we're at the bottom of the page
-        if (scrollTop + windowHeight >= documentHeight - 10) {
-          activeSection = 'services';
-        } else if (scrollTop > 100) {
-          sections.slice(1).forEach(sectionId => {
-            const element = document.getElementById(sectionId);
-            if (element) {
-              const rect = element.getBoundingClientRect();
-              if (rect.top <= window.innerHeight / 2) {
-                activeSection = sectionId;
-              }
-            }
-          });
-        }
-
-        navDots.forEach(dot => {
-          dot.classList.remove('active');
-          if (dot.dataset.section === activeSection) {
-            dot.classList.add('active');
-          }
-        });
-      }
-
-      // Show/hide navigation elements
-      window.addEventListener('scroll', function() {
-        const progressNav = document.getElementById('progressNav');
-
-        if (window.pageYOffset > 100) {
-          progressNav.style.opacity = '1';
-          progressNav.style.visibility = 'visible';
-        } else {
-          progressNav.style.opacity = '0';
-          progressNav.style.visibility = 'hidden';
-        }
-
-        updateActiveSection();
-      });
-
-      // Navigation dot click handlers
-      document.addEventListener('DOMContentLoaded', function() {
-        const navDots = document.querySelectorAll('.nav-dot');
-
-        navDots.forEach(dot => {
-          // Add click/touch event for navigation
-          dot.addEventListener('click', function() {
-            const section = this.dataset.section;
-
-            if (section === 'top') {
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            } else {
-              const element = document.getElementById(section);
-              if (element) {
-                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-              }
-            }
-          });
-
-          // Add touch support for mobile
-          dot.addEventListener('touchstart', function(e) {
-            this.style.transform = 'scale(0.95)';
-          });
-
-          dot.addEventListener('touchend', function(e) {
-            this.style.transform = '';
-          });
-        });
-
-        // Improve mobile scrolling performance
-        if (window.innerWidth <= 768) {
-          let ticking = false;
-
-          function updateNavigation() {
-            updateActiveSection();
-            ticking = false;
-          }
-
-          window.addEventListener('scroll', function() {
-            if (!ticking) {
-              requestAnimationFrame(updateNavigation);
-              ticking = true;
-            }
-          });
-        }
-      });
-
       // Toggle publications function
       function togglePublications() {
         const extraPublications = document.getElementById('extraPublications');
@@ -167,7 +72,7 @@
                 </p>
                 <p style="text-align:center">
                   <a href="mailto:luxinyayaya@foxmail.com">Email</a> &nbsp;/&nbsp;
-                  <a href="assets/keyi-en-short.pdf">CV</a> &nbsp;/&nbsp;
+                  <a href="assets/CV-keyi.pdf">CV</a> &nbsp;/&nbsp;
                   <a href="https://scholar.google.com/citations?&user=E_jCf7cAAAAJ">Google Scholar</a> &nbsp;/&nbsp;
                   <a href="https://github.com/luxinyayaya">Github</a>
                 </p>
@@ -201,17 +106,18 @@
           <tr>
             <td style="padding:4px;width:100%;vertical-align:middle" class="paper-card">
               <span class="papertitle">Scaling Instruction-Finetuning for Zero-Shot Generative Retrieval</span>
-              <class="author"> Weiwei Sun*, <span style="font-family: 'Arial Black'">Keyi Kong*</span>, Xinyu Ma, Shuaiqiang Wang, Dawei Yin, Maarten de Rijke, Zhaochun Ren, Yiming Yang
-              </span>
+              <div class="author"> Weiwei Sun*, <span class="my-name">Keyi Kong*</span>, Xinyu Ma, Shuaiqiang Wang, Dawei Yin, Maarten de Rijke, Zhaochun Ren, Yiming Yang
+              </div>
               <em>Under Review</em>
+              <a href="https://arxiv.org/pdf/2510.10419">Paper</a>
             </td>
           </tr>
 
           <tr>
             <td style="padding:4px;width:100%;vertical-align:middle" class="paper-card">
               <span class="papertitle">Perplexity-aware Correction for Robust Alignment with Noisy Preferences</span>
-              <class="author"> <span style="font-family: 'Arial Black'">Keyi Kong*</span>, Xilie Xu*, Di Wang, Jingfeng Zhang, Mohan Kankanhalli
-              </span>
+              <div class="author"> <span class="my-name">Keyi Kong*</span>, Xilie Xu*, Di Wang, Jingfeng Zhang, Mohan Kankanhalli
+              </div>
               <em>Accepted by NeurIPS 2024</em>
               <a href="https://openreview.net/attachment?id=OUXnnPJzXJ&name=pdf">Paper</a> / <a href="https://github.com/luxinyayaya/PerpCorrect">Code</a>
             </td>
@@ -220,8 +126,8 @@
           <tr>
             <td style="padding:4px;width:100%;vertical-align:middle" class="paper-card">
               <span class="papertitle">An LLM can Fool Itself: A Prompt-Based Adversarial Attack</span>
-              <class="author"> Xilie Xu*, <span style="font-family: 'Arial Black'">Keyi Kong*</span>, Ning Liu, Lizhen Cui, Di Wang, Jingfeng Zhang, Mohan Kankanhalli
-              </span>
+              <div class="author"> Xilie Xu*, <span class="my-name">Keyi Kong*</span>, Ning Liu, Lizhen Cui, Di Wang, Jingfeng Zhang, Mohan Kankanhalli
+              </div>
               <em>Accepted by ICLR 2024</em>
               <a href="https://openreview.net/pdf?id=VVgGbB9TNV">Paper</a> / <a href="https://github.com/GodXuxilie/PromptAttack">Code</a>
             </td>
@@ -234,19 +140,9 @@
 
           <tr>
             <td style="padding:4px;width:100%;vertical-align:middle" class="paper-card">
-              <span class="papertitle">Music’s Multimodal Complexity in AVQA: Why We Need More than General Multimodal LLMs</span>
-              <class="author"> Wenhao You, Xingjian Diao, Chunhui Zhang, <span style="font-family: 'Arial Black'">Keyi Kong</span>, Weiyi Wu, Zhongyu Ouyang, Chiyu Ma, Tingxuan Wu, Noah Wei, Zong Ke, Ming Cheng, Soroush Vosoughi, Jiang Gui 
-              </span>
-              <em>Under Review</em>
-              <a href="https://arxiv.org/abs/2505.20638">Paper</a> / <a href="https://github.com/xid32/Survey4MusicAVQA">Code</a>
-            </td>
-          </tr>
-
-          <tr>
-            <td style="padding:4px;width:100%;vertical-align:middle" class="paper-card">
               <span class="papertitle">Towards AI Search Paradigm</span>
-              <class="author"> Baidu Search
-              </span>
+              <div class="author"> Baidu Search
+              </div>
               <em>Technical Report</em>
               <a href="https://arxiv.org/abs/2506.17188">Paper</a>
             </td>
@@ -255,9 +151,9 @@
           <tr>
             <td style="padding:4px;width:100%;vertical-align:middle" class="paper-card">
               <span class="papertitle">SoundMind: RL-Incentivized Logic Reasoning for Audio-Language Models</span>
-              <class="author"> Xingjian Diao, Chunhui Zhang, <span style="font-family: 'Arial Black'">Keyi Kong</span>, Weiyi Wu, Chiyu Ma, Zhongyu Ouyang, Peijun Qing, Soroush Vosoughi, Jiang Gui
-              </span>
-              <em>Accepted by EMNLP 2025</em>
+              <div class="author"> Xingjian Diao, Chunhui Zhang, <span class="my-name">Keyi Kong</span>, Weiyi Wu, Chiyu Ma, Zhongyu Ouyang, Peijun Qing, Soroush Vosoughi, Jiang Gui
+              </div>
+              <em>Accepted by EMNLP 2025 (Oral presentation)</em>
               <a href="https://arxiv.org/abs/2506.12935">Paper</a> / <a href="https://github.com/xid32/SoundMind">Code</a> / <a href="https://huggingface.co/datasets/SoundMind-RL/SoundMindDataset">Dataset</a>
             </td>
           </tr>
@@ -265,18 +161,28 @@
           <tr>
             <td style="padding:4px;width:100%;vertical-align:middle" class="paper-card">
               <span class="papertitle">An End-to-End Adaptable Prototypical Framework for Explainable Fine-Grained Visual Question Answering</span>
-              <class="author"> Xingjian Diao*, Weiyi Wu*,  <span style="font-family: 'Arial Black'">Keyi Kong</span>, Peijun Qing, Xinwen Xu, Ming Cheng, Soroush Vosoughi, Jiang Gui
-              </span>
-              <em>Accepted by EMNLP 2025</em>
+              <div class="author"> Xingjian Diao*, Weiyi Wu*,  <span class="my-name">Keyi Kong</span>, Peijun Qing, Xinwen Xu, Ming Cheng, Soroush Vosoughi, Jiang Gui
+              </div>
+              <em>Accepted by EMNLP 2025 (Oral presentation)</em>
               <a href="https://arxiv.org/abs/2509.16680">Paper</a>
             </td>
           </tr>
 
           <tr>
             <td style="padding:4px;width:100%;vertical-align:middle" class="paper-card">
+              <span class="papertitle">Music's Multimodal Complexity in AVQA: Why We Need More than General Multimodal LLMs</span>
+              <div class="author"> Wenhao You, Xingjian Diao, Chunhui Zhang, <span class="my-name">Keyi Kong</span>, Weiyi Wu, Zhongyu Ouyang, Chiyu Ma, Tingxuan Wu, Noah Wei, Zong Ke, Ming Cheng, Soroush Vosoughi, Jiang Gui
+              </div>
+              <em>Under Review</em>
+              <a href="https://arxiv.org/abs/2505.20638">Paper</a> / <a href="https://github.com/xid32/Survey4MusicAVQA">Code</a>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:4px;width:100%;vertical-align:middle" class="paper-card">
               <span class="papertitle">Generative Agents for Multimodal Controversy Detection</span>
-              <class="author"> Tianjiao Xu, Jinfei Gao, <span style="font-family: 'Arial Black'">Keyi Kong</span>, Jianhua Yin, Tian Gao, Liqiang Nie
-              </span>
+              <div class="author"> Tianjiao Xu, Jinfei Gao, <span class="my-name">Keyi Kong</span>, Jianhua Yin, Tian Gao, Liqiang Nie
+              </div>
               <em>Accepted by IJCAI 2025</em>
               <a href="https://www.ijcai.org/proceedings/2025/1107">Paper</a>
             </td>
@@ -284,19 +190,10 @@
 
           <tr>
             <td style="padding:4px;width:100%;vertical-align:middle" class="paper-card">
-              <span class="papertitle">Autonomous Task-Dependency Planning via Uncertainty-aware Bidirectional Reasoning</span>
-              <class="author"> Wentao Deng, Jiahuan Pei, <span style="font-family: 'Arial Black'">Keyi Kong</span>, Mengqi Zhang, Hongyu Lu, Xin Xin, Zhaochun Ren, Zhumin Chen, Pengjie Ren 
-              </span>
-              <em>Under Review</em>
-            </td>
-          </tr>
-
-          <tr>
-            <td style="padding:4px;width:100%;vertical-align:middle" class="paper-card">
               <span class="papertitle">Syllogistic Reasoning for Legal Judgment Analysis</span>
-              <class="author"> Wentao Deng, Jiahuan Pei, <span style="font-family: 'Arial Black'">Keyi Kong</span>, Zhe Chen, Furu Wei, Yujun Li, Zhaochun Ren, Zhumin Chen, Pengjie Ren
-              </span>
-              <em>Accepted by EMNLP 2023</em>
+              <div class="author"> Wentao Deng, Jiahuan Pei, <span class="my-name">Keyi Kong</span>, Zhe Chen, Furu Wei, Yujun Li, Zhaochun Ren, Zhumin Chen, Pengjie Ren
+              </div>
+              <em>Accepted by EMNLP 2023 (Oral presentation)</em>
               <a href="https://openreview.net/attachment?id=7Jis2yiiEZ&name=pdf">Paper</a> / <a href="https://github.com/dengwentao99/SLJA">Code</a> / <a href="https://share.weiyun.com/KpNPqFtt">Dataset</a>
             </td>
           </tr>
@@ -371,36 +268,6 @@
         </td>
       </tr>
     </tbody></table>
-
-    <!-- Progress Navigation Bar -->
-    <div id="progressNav" class="progress-nav">
-      <div class="nav-dots">
-        <div class="nav-dot" data-section="top" title="Top">
-          <div class="dot-indicator"></div>
-          <span class="dot-label">Top</span>
-        </div>
-        <div class="nav-dot" data-section="publications" title="Publications">
-          <div class="dot-indicator"></div>
-          <span class="dot-label">Publications</span>
-        </div>
-        <div class="nav-dot" data-section="experience" title="Experience">
-          <div class="dot-indicator"></div>
-          <span class="dot-label">Experience</span>
-        </div>
-        <div class="nav-dot" data-section="education" title="Education">
-          <div class="dot-indicator"></div>
-          <span class="dot-label">Education</span>
-        </div>
-        <div class="nav-dot" data-section="awards" title="Awards">
-          <div class="dot-indicator"></div>
-          <span class="dot-label">Awards</span>
-        </div>
-        <div class="nav-dot" data-section="services" title="Services">
-          <div class="dot-indicator"></div>
-          <span class="dot-label">Services</span>
-        </div>
-      </div>
-    </div>
 
   </body>
 </html>
