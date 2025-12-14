@@ -61,6 +61,19 @@
         if (event.target.closest('a')) return;
         toggleAbstract(id);
       }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('in-view');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.12 });
+
+        document.querySelectorAll('.paper-card').forEach((el) => observer.observe(el));
+      });
     </script>
 
   </head>
@@ -247,7 +260,7 @@
                 <ul>
                   <li style="margin-bottom: 4px;"> <strong>2024.11 - 2025.11 :</strong> Research Intern, Baidu Search, under Dr. Xinyu Ma</li>
                   <li style="margin-bottom: 4px;"> <strong>2024.07 - 2024.09 :</strong> Research Intern, National University of Singapore, under Prof. Mohan Kankanhalli</li>
-                  <li style="margin-bottom: 4px;"> <strong>2023.09 - 2024.05 :</strong> Research Assistant, IR Lab, Shandong University, under Prof. Pengjie Ren</li>
+                  <li style="margin-bottom: 4px;"> <strong>2023.09 - 2024.05 :</strong> Research Assistant, Shandong University, under Prof. Pengjie Ren</li>
                 </ul>
               </td>
             </tr>
