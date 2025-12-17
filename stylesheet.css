@@ -368,13 +368,15 @@ img:hover {
     color: var(--muted);
     margin-top: 0;
     padding-top: 0;
-    line-height: 1.6;
+    line-height: 1.7;
     border-top: 1px dashed transparent;
     text-align: left;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 15px;
 }
 
 .abstract.open {
-    max-height: 500px;
+    max-height: none;
     opacity: 1;
     margin-top: 12px;
     padding-top: 12px;
@@ -490,11 +492,13 @@ li {
 
     /* Paper cards mobile optimization */
     .paper-card {
-        max-width: 100%;
-        width: 100%;
-        margin: 0 14px 18px 14px;
-        padding: 28px;
+        display: block !important;
+        max-width: 940px !important;
+        width: calc(100% - 28px) !important;
+        margin: 0 auto 18px auto !important;
+        padding: 28px !important;
         border-radius: 14px;
+        box-sizing: border-box !important;
     }
 
     .papertitle {
@@ -529,16 +533,16 @@ li {
 
     /* Experience cards mobile */
     .experience-container {
-        grid-template-columns: 1fr;
-        width: 100%;
+        grid-template-columns: 1fr !important;
+        width: calc(100% - 28px) !important;
         margin: 0 auto 24px;
         gap: 16px;
     }
 
     /* Awards cards mobile */
     .awards-container {
-        grid-template-columns: 1fr;
-        width: 100%;
+        grid-template-columns: 1fr !important;
+        width: calc(100% - 28px) !important;
         margin: 0 auto 24px;
         gap: 16px;
     }
@@ -585,8 +589,8 @@ li {
 
     /* Education cards mobile */
     .education-container {
-        grid-template-columns: 1fr;
-        width: 100%;
+        grid-template-columns: 1fr !important;
+        width: calc(100% - 28px) !important;
         margin: 0 auto 24px;
         gap: 16px;
     }
@@ -598,7 +602,9 @@ li {
     }
 
     .education-logos {
+        flex-direction: column !important;
         gap: 10px;
+        align-items: center;
     }
 
     .education-logo {
@@ -624,8 +630,8 @@ li {
 
     /* Services cards mobile */
     .services-container {
-        grid-template-columns: 1fr;
-        width: 100%;
+        grid-template-columns: 1fr !important;
+        width: calc(100% - 28px) !important;
         margin: 0 auto 24px;
         gap: 16px;
     }
@@ -706,11 +712,13 @@ li {
     }
 
     .paper-card {
-        max-width: 100%;
-        width: 100%;
-        margin: 0 8px 14px 8px;
-        padding: 24px;
+        display: block !important;
+        max-width: 940px !important;
+        width: calc(100% - 16px) !important;
+        margin: 0 auto 14px auto !important;
+        padding: 24px !important;
         border-radius: 12px;
+        box-sizing: border-box !important;
     }
 
     .papertitle {
@@ -746,12 +754,16 @@ li {
 
     /* Experience cards extra small mobile */
     .experience-container {
+        grid-template-columns: 1fr !important;
+        width: calc(100% - 16px) !important;
         margin: 0 auto 20px;
         gap: 14px;
     }
 
     /* Awards cards extra small mobile */
     .awards-container {
+        grid-template-columns: 1fr !important;
+        width: calc(100% - 16px) !important;
         margin: 0 auto 20px;
         gap: 14px;
     }
@@ -798,6 +810,8 @@ li {
 
     /* Education cards extra small mobile */
     .education-container {
+        grid-template-columns: 1fr !important;
+        width: calc(100% - 16px) !important;
         margin: 0 auto 20px;
         gap: 14px;
     }
@@ -809,7 +823,9 @@ li {
     }
 
     .education-logos {
+        flex-direction: column !important;
         gap: 8px;
+        align-items: center;
     }
 
     .education-logo {
@@ -835,6 +851,8 @@ li {
 
     /* Services cards extra small mobile */
     .services-container {
+        grid-template-columns: 1fr !important;
+        width: calc(100% - 16px) !important;
         margin: 0 auto 20px;
         gap: 14px;
     }
