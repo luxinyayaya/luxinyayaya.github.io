@@ -95,7 +95,7 @@
                   Keyi Kong 孔轲祎
                 </p>
                 <p>
-                    Hi, I am a final-year undergraduate student at <a href="https://www.tsxt.sdu.edu.cn/">Taishan (Honors) College</a>, <a href="https://www.sdu.edu.cn/">Shandong University</a>, working under the supervision of Associate Professor <a href="https://renzhaochun.github.io/">Zhaochun Ren</a>. My research interests focus on Trustworthy Large Language Models (LLMs) and Generative Information Retrieval (GenIR). Additionally, I am passionate about competitive programming.
+                    Hi, I am a final-year undergraduate student at <a href="https://www.tsxt.sdu.edu.cn/">Taishan (Honors) College</a>, <a href="https://www.sdu.edu.cn/">Shandong University</a>, working under the supervision of Associate Professor <a href="https://renzhaochun.github.io/">Zhaochun Ren</a>. My research interests span <b>Life Science Large Language Models</b>, <b>Trustworthy Large Language Models (LLMs)</b>, and <b>Generative Information Retrieval (GenIR)</b>. Additionally, I am passionate about competitive programming.
                 </p>
                 <p>
                 <span style="color: #d07a38;"><strong>I am currently seeking PhD positions for 2026 fall! </strong></span> If my background resonates with your work, I would welcome the opportunity to connect.
@@ -195,6 +195,21 @@
                 <img src="assets/aisearch-thumbnail.png" alt="AI Search Paradigm" class="thumbnail-img">
               </div>
               <div class="abstract" id="abs-aisearch">In this paper, we introduce the AI Search Paradigm, a comprehensive blueprint for next-generation search systems capable of emulating human information processing and decision-making. The paradigm employs a modular architecture of four LLM-powered agents (Master, Planner, Executor and Writer) that dynamically adapt to the full spectrum of information needs, from simple factual queries to complex multi-stage reasoning tasks. These agents collaborate dynamically through coordinated workflows to evaluate query complexity, decompose problems into executable plans, and orchestrate tool usage, task execution, and content synthesis. We systematically present key methodologies for realizing this paradigm, including task planning and tool integration, execution strategies, aligned and robust retrieval-augmented generation, and efficient LLM inference, spanning both algorithmic techniques and infrastructure-level optimizations. By providing an in-depth guide to these foundational components, this work aims to inform the development of trustworthy, adaptive, and scalable AI search systems.</div>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:4px;width:100%;vertical-align:middle" class="paper-card" onclick="toggleCardAbstract(event, 'abs-gpro')">
+              <a href="https://arxiv.org/abs/2601.04442" class="papertitle">Addressing Overthinking in Large Vision-Language Models via Gated Perception-Reasoning Optimization</a>
+              <div class="author"> Xingjian Diao, Zheyuan Liu, Chunhui Zhang, Weiyi Wu, <span class="my-name">Keyi Kong</span>, Lin Shi, Kaize Ding, Soroush Vosoughi, Jiang Gui
+              </div>
+              <div class="paper-actions">
+                <em>Under Review</em>
+              </div>
+              <div class="paper-thumbnail">
+                <img src="assets/gpro-thumbnail.png" alt="AI Search Paradigm" class="thumbnail-img">
+              </div>
+              <div class="abstract" id="abs-gpro">Large Vision-Language Models (LVLMs) have exhibited strong reasoning capabilities through chain-of-thought mechanisms that generate step-by-step rationales. However, such slow-thinking approaches often lead to overthinking, where models produce excessively verbose responses even for simple queries, resulting in test-time inefficiency and even degraded accuracy. Prior work has attempted to mitigate this issue via adaptive reasoning strategies, but these methods largely overlook a fundamental bottleneck: visual perception failures. We argue that stable reasoning critically depends on low-level visual grounding, and that reasoning errors often originate from imperfect perception rather than insufficient deliberation. To address this limitation, we propose Gated Perception-Reasoning Optimization (GPRO), a meta-reasoning controller that dynamically routes computation among three decision paths at each generation step: a lightweight fast path, a slow perception path for re-examining visual inputs, and a slow reasoning path for internal self-reflection. To learn this distinction, we derive large-scale failure attribution supervision from approximately 790k samples, using teacher models to distinguish perceptual hallucinations from reasoning errors. We then train the controller with multi-objective reinforcement learning to optimize the trade-off between task accuracy and computational cost under uncertainty. Experiments on five benchmarks demonstrate that GPRO substantially improves both accuracy and efficiency, outperforming recent slow-thinking methods while generating significantly shorter responses.</div>
             </td>
           </tr>
 
