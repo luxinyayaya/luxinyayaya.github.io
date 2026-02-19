@@ -7,13 +7,21 @@
 
     <meta name="author" content="Keyi Kong">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- Favicon removed as requested -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Sora:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="stylesheet.css?v=8">
+    <link rel="stylesheet" type="text/css" href="stylesheet.css?v=9">
 
     <script>
+      // ======== Theme (run immediately to prevent flash) ========
+      (function() {
+        var saved = localStorage.getItem('theme');
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var theme = saved || (prefersDark ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      })();
+
+      // ======== Profile Image Flip ========
       let isAIImage = true;
 
       function flipImage() {
@@ -28,35 +36,67 @@
           }
           isAIImage = !isAIImage;
           img.style.transform = 'rotateY(0deg)';
-          img.loading = 'lazy';
-        }, 150);
+        }, 300);
       }
 
-
-      // Toggle publications function
+      // ======== Toggle Publications (smooth) ========
       function togglePublications() {
         const extraPublications = document.getElementById('extraPublications');
         const toggleBtn = document.getElementById('togglePublications');
         const toggleText = toggleBtn.querySelector('.toggle-text');
         const toggleIcon = toggleBtn.querySelector('.toggle-icon');
+        const isExpanded = extraPublications.classList.contains('expanded');
 
-        if (extraPublications.style.display === 'none' || extraPublications.style.display === '') {
-          extraPublications.style.display = 'block';
+        if (!isExpanded) {
+          extraPublications.classList.add('expanded');
           toggleText.textContent = 'Show Less';
           toggleIcon.style.transform = 'rotate(180deg)';
+          toggleBtn.setAttribute('aria-expanded', 'true');
         } else {
-          extraPublications.style.display = 'none';
+          extraPublications.classList.remove('expanded');
           toggleText.textContent = 'Show More';
           toggleIcon.style.transform = 'rotate(0deg)';
+          toggleBtn.setAttribute('aria-expanded', 'false');
+          document.getElementById('publications').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
       }
 
+      // ======== Abstract Toggle (accordion) ========
       function toggleAbstract(id) {
         const panel = document.getElementById(id);
         if (!panel) return;
+        const isOpening = !panel.classList.contains('open');
+
+        // Accordion: close other abstracts
+        if (isOpening) {
+          document.querySelectorAll('.abstract.open').forEach(other => {
+            if (other.id !== id) {
+              other.classList.remove('open');
+              const otherThumb = other.previousElementSibling;
+              if (otherThumb && otherThumb.classList.contains('paper-thumbnail')) {
+                otherThumb.classList.remove('open');
+              }
+              const otherCard = other.closest('.paper-card');
+              if (otherCard) {
+                otherCard.setAttribute('aria-expanded', 'false');
+                const otherHint = otherCard.querySelector('.expand-hint');
+                if (otherHint) otherHint.classList.remove('expanded');
+              }
+            }
+          });
+        }
+
         panel.classList.toggle('open');
 
-        // Toggle thumbnail visibility
+        // Update aria-expanded
+        const card = panel.closest('.paper-card');
+        if (card) {
+          card.setAttribute('aria-expanded', panel.classList.contains('open'));
+          const hint = card.querySelector('.expand-hint');
+          if (hint) hint.classList.toggle('expanded', panel.classList.contains('open'));
+        }
+
+        // Toggle thumbnail
         const thumbnail = panel.previousElementSibling;
         if (thumbnail && thumbnail.classList.contains('paper-thumbnail')) {
           thumbnail.classList.toggle('open');
@@ -68,43 +108,102 @@
         toggleAbstract(id);
       }
 
+      // ======== DOMContentLoaded ========
       document.addEventListener('DOMContentLoaded', () => {
-        const observer = new IntersectionObserver((entries) => {
+        // Scroll reveal for all card types
+        const revealObserver = new IntersectionObserver((entries) => {
           entries.forEach((entry) => {
             if (entry.isIntersecting) {
               entry.target.classList.add('in-view');
-              observer.unobserve(entry.target);
+              revealObserver.unobserve(entry.target);
             }
           });
         }, { threshold: 0.12 });
 
-        document.querySelectorAll('.paper-card').forEach((el) => observer.observe(el));
+        document.querySelectorAll('.paper-card, .reveal-card').forEach((el) => revealObserver.observe(el));
+
+        // ---- Back to top scroll handler ----
+        const backToTop = document.getElementById('backToTop');
+        let ticking = false;
+
+        window.addEventListener('scroll', () => {
+          if (!ticking) {
+            requestAnimationFrame(() => {
+              if (backToTop) {
+                backToTop.classList.toggle('visible', window.scrollY > 500);
+              }
+              ticking = false;
+            });
+            ticking = true;
+          }
+        }, { passive: true });
+
+        // ---- Theme toggle ----
+        const themeToggle = document.getElementById('themeToggle');
+        if (themeToggle) {
+          themeToggle.addEventListener('click', () => {
+            const current = document.documentElement.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+          });
+        }
+
+        // ---- Back to top click ----
+        if (backToTop) {
+          backToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          });
+        }
       });
     </script>
 
   </head>
 
   <body>
+    <!-- Theme Toggle (fixed bottom-right) -->
+    <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">
+      <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+      </svg>
+      <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+    </button>
+
     <table style="width:100%;max-width:1100px;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;" class="main-container"><tbody>
       <tr style="padding:0px">
         <td style="padding:0px">
-          <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;"><tbody>
+          <!-- Hero Section -->
+          <table class="hero-section" style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;"><tbody>
             <tr style="padding:0px">
               <td style="padding:3% 1.5% 3% 3%;width:60%;vertical-align:middle">
                 <p class="name" style="text-align: center;">
-                  Keyi Kong 孔轲祎
+                  Keyi Kong
                 </p>
                 <p>
                     Hi, I am a final-year undergraduate student at <a href="https://www.tsxt.sdu.edu.cn/">Taishan (Honors) College</a>, <a href="https://www.sdu.edu.cn/">Shandong University</a>, working under the supervision of Associate Professor <a href="https://renzhaochun.github.io/">Zhaochun Ren</a>. My research interests span <b>Life Science Large Language Models</b>, <b>Trustworthy Large Language Models (LLMs)</b>, and <b>Generative Information Retrieval (GenIR)</b>. Additionally, I am passionate about competitive programming.
                 </p>
-                <p>
+                <!-- <p>
                 <span style="color: #d07a38;"><strong>I am currently seeking PhD positions for 2026 fall! </strong></span> If my background resonates with your work, I would welcome the opportunity to connect.
-                </p>
+                </p> -->
                 <p style="text-align:center" class="contact-links">
-                  <a href="mailto:luxinyayaya@foxmail.com">Email</a>
-                  <a href="assets/CV-keyi.pdf">CV</a>
-                  <a href="https://scholar.google.com/citations?&user=E_jCf7cAAAAJ">Google Scholar</a>
-                  <a href="https://github.com/luxinyayaya">Github</a>
+                  <a href="mailto:luxinyayaya@foxmail.com">
+                    <svg class="contact-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 7L2 7"/></svg>
+                    Email
+                  </a>
+                  <a href="assets/CV-keyi.pdf">
+                    <svg class="contact-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                    CV
+                  </a>
+                  <a href="https://scholar.google.com/citations?&user=E_jCf7cAAAAJ">
+                    <svg class="contact-icon" width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M5.242 13.769L0 9.5 12 0l12 9.5-5.242 4.269C17.548 11.249 14.978 9.5 12 9.5c-2.977 0-5.548 1.748-6.758 4.269zM12 10a7 7 0 1 0 0 14 7 7 0 0 0 0-14z"/></svg>
+                    Scholar
+                  </a>
+                  <a href="https://github.com/luxinyayaya">
+                    <svg class="contact-icon" width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+                    GitHub
+                  </a>
                 </p>
               </td>
               <td style="padding:3% 3% 3% 1.5%;width:40%;max-width:40%;text-align:center;">
@@ -119,7 +218,7 @@
               <td style="padding:16px;width:100%;vertical-align:middle">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                   <h2 id="publications" style="margin: 0;">Publications</h2>
-                  <button id="togglePublications" class="toggle-btn" onclick="togglePublications()">
+                  <button id="togglePublications" class="toggle-btn" onclick="togglePublications()" aria-expanded="false">
                     <span class="toggle-text">Show More</span>
                     <svg class="toggle-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -132,49 +231,54 @@
           </tbody></table>
           <table style="width:100%;border:0px;border-spacing:0px 15px;border-collapse:separate;margin-right:auto;margin-left:auto;"><tbody>
 
-          <!-- Publication Item 1 -->
+          <!-- Publication 1: ZeroGR -->
           <tr>
-            <td style="padding:4px;width:100%;vertical-align:middle" class="paper-card" onclick="toggleCardAbstract(event, 'abs-zerogr')">
+            <td style="padding:4px;width:100%;vertical-align:middle" class="paper-card" role="button" tabindex="0" aria-expanded="false" onclick="toggleCardAbstract(event, 'abs-zerogr')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleCardAbstract(event, 'abs-zerogr')}">
               <a href="https://arxiv.org/pdf/2510.10419" class="papertitle">ZeroGR: A Generalizable and Scalable Framework for Zero-Shot Generative Retrieval</a>
               <div class="author"> Weiwei Sun*, <span class="my-name">Keyi Kong*</span>, Xinyu Ma, Shuaiqiang Wang, Dawei Yin, Maarten de Rijke, Zhaochun Ren, Yiming Yang
               </div>
               <div class="paper-actions">
                 <em>Accepted by ICLR 2026</em>
               </div>
+              <div class="expand-hint"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
               <div class="paper-thumbnail">
-                <img src="assets/zerogr-thumbnail.png" alt="ZeroGR Framework" class="thumbnail-img">
+                <img src="assets/zerogr-thumbnail.webp" alt="ZeroGR Framework" class="thumbnail-img" width="2248" height="656" loading="lazy">
               </div>
               <div class="abstract" id="abs-zerogr">Generative retrieval (GR) reformulates information retrieval (IR) by framing it as the generation of document identifiers (docids), thereby enabling an end-to-end optimization and seamless integration with generative language models (LMs). Despite notable progress under supervised training, GR still struggles to generalize to zero-shot IR scenarios, which are prevalent in real-world applications. To tackle this challenge, we propose ZeroGR, a zero-shot generative retrieval framework that leverages natural language instructions to extend GR across a wide range of IR tasks. Specifically, ZeroGR is composed of three key components: (i) an LM-based docid generator that unifies heterogeneous documents (e.g., text, tables, code) into semantically meaningful docids; (ii) an instruction-tuned query generator that generates diverse types of queries from natural language task descriptions to enhance corpus indexing; and (iii) a reverse annealing decoding strategy to balance precision and recall during docid generation. We investigate the impact of instruction fine-tuning scale and find that performance consistently improves as the number of IR tasks encountered during training increases. Empirical results on the BEIR and MAIR benchmarks demonstrate that ZeroGR outperforms strong dense retrieval and generative baselines in zero-shot settings, establishing a new state-of-the-art for instruction-driven GR.</div>
             </td>
           </tr>
 
+          <!-- Publication 2: PerpCorrect -->
           <tr>
-            <td style="padding:4px;width:100%;vertical-align:middle" class="paper-card" onclick="toggleCardAbstract(event, 'abs-perp')">
+            <td style="padding:4px;width:100%;vertical-align:middle" class="paper-card" role="button" tabindex="0" aria-expanded="false" onclick="toggleCardAbstract(event, 'abs-perp')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleCardAbstract(event, 'abs-perp')}">
               <a href="https://openreview.net/attachment?id=OUXnnPJzXJ&name=pdf" class="papertitle">Perplexity-aware Correction for Robust Alignment with Noisy Preferences</a>
               <div class="author"> <span class="my-name">Keyi Kong*</span>, Xilie Xu*, Di Wang, Jingfeng Zhang, Mohan Kankanhalli
               </div>
               <div class="paper-actions">
                 <em>Accepted by NeurIPS 2024</em>
               </div>
+              <div class="expand-hint"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
               <div class="paper-thumbnail">
-                <img src="assets/perp-thumbnail.png" alt="PerpCorrect Framework" class="thumbnail-img">
+                <img src="assets/perp-thumbnail.webp" alt="PerpCorrect Framework" class="thumbnail-img" width="2046" height="492" loading="lazy">
               </div>
               <div class="abstract" id="abs-perp">Alignment techniques are critical in ensuring that large language models (LLMs) output helpful and harmless content by enforcing the LLM-generated content to align with human preferences. However, the existence of noisy preferences (NPs), where the responses are mistakenly labelled as chosen or rejected, could spoil the alignment, thus making the LLMs generate useless and even malicious content. Existing methods mitigate the issue of NPs from the loss perspective by adjusting the alignment loss based on a clean validation dataset. Orthogonal to these loss-oriented methods, we propose perplexity-aware correction (PerpCorrect) from the data perspective for robust alignment which detects and corrects NPs based on the differences between the perplexity of the chosen and rejected responses (dubbed as PPLDiff). Intuitively, a higher PPLDiff indicates a higher probability of the NP because a rejected/chosen response which is mistakenly labelled as chosen/rejected is less preferable to be generated by an aligned LLM, thus having a higher/lower perplexity. PerpCorrect works in three steps: (1) PerpCorrect aligns a surrogate LLM using the clean validation data to make the PPLDiff able to distinguish clean preferences (CPs) and NPs. (2) PerpCorrect further aligns the surrogate LLM by incorporating the reliable clean training data whose PPLDiff is extremely small and reliable noisy training data whose PPLDiff is extremely large after correction to boost the discriminatory power. (3) Detecting and correcting NPs according to the PPLDiff obtained by the aligned surrogate LLM to obtain a denoised training dataset for robust alignment. Comprehensive experiments validate that our proposed PerpCorrect can achieve state-of-the-art alignment performance under NPs. Notably, PerpCorrect demonstrates practical utility by requiring only a modest amount of validation data and being compatible with various alignment techniques.</div>
             </td>
           </tr>
 
+          <!-- Publication 3: PromptAttack -->
           <tr>
-            <td style="padding:4px;width:100%;vertical-align:middle" class="paper-card" onclick="toggleCardAbstract(event, 'abs-attack')">
+            <td style="padding:4px;width:100%;vertical-align:middle" class="paper-card" role="button" tabindex="0" aria-expanded="false" onclick="toggleCardAbstract(event, 'abs-attack')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleCardAbstract(event, 'abs-attack')}">
               <a href="https://openreview.net/pdf?id=VVgGbB9TNV" class="papertitle">An LLM can Fool Itself: A Prompt-Based Adversarial Attack</a>
               <div class="author"> Xilie Xu*, <span class="my-name">Keyi Kong*</span>, Ning Liu, Lizhen Cui, Di Wang, Jingfeng Zhang, Mohan Kankanhalli
               </div>
               <div class="paper-actions">
                 <em>Accepted by ICLR 2024</em>
               </div>
+              <div class="expand-hint"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
               <div class="paper-thumbnail">
-                <img src="assets/attack-thumbnail.png" alt="PromptAttack Framework" class="thumbnail-img">
+                <img src="assets/attack-thumbnail.webp" alt="PromptAttack Framework" class="thumbnail-img" width="2876" height="830" loading="lazy">
               </div>
-              <div class="abstract" id="abs-attack">The wide-ranging applications of large language models (LLMs), especially in safety-critical domains, necessitate the proper evaluation of the LLM’s adversarial robustness. This paper proposes an efficient tool to audit the LLM’s adversarial robustness via a prompt-based adversarial attack (PromptAttack). PromptAttack converts adversarial textual attacks into an attack prompt that can cause the victim LLM to output the adversarial sample to fool itself. The attack prompt is composed of three important components: (1) original input (OI) including the original sample and its ground-truth label, (2) attack objective (AO) illustrating a task description of generating a new sample that can fool itself without changing the semantic meaning, and (3) attack guidance (AG) containing the perturbation instructions to guide the LLM on how to complete the task by perturbing the original sample at character, word, and sentence levels, respectively. Besides, we use a fidelity filter to ensure that PromptAttack maintains the original semantic meanings of the adversarial examples. Further, we enhance the attack power of PromptAttack by ensembling adversarial examples at different perturbation levels. Comprehensive empirical results using Llama2 and GPT-3.5 validate that PromptAttack consistently yields a much higher attack success rate compared to AdvGLUE and AdvGLUE++. Interesting findings include that a simple emoji can easily mislead GPT-3.5 to make wrong predictions. Our source code is available at https://github.com/GodXuxilie/PromptAttack.</div>
+              <div class="abstract" id="abs-attack">The wide-ranging applications of large language models (LLMs), especially in safety-critical domains, necessitate the proper evaluation of the LLM's adversarial robustness. This paper proposes an efficient tool to audit the LLM's adversarial robustness via a prompt-based adversarial attack (PromptAttack). PromptAttack converts adversarial textual attacks into an attack prompt that can cause the victim LLM to output the adversarial sample to fool itself. The attack prompt is composed of three important components: (1) original input (OI) including the original sample and its ground-truth label, (2) attack objective (AO) illustrating a task description of generating a new sample that can fool itself without changing the semantic meaning, and (3) attack guidance (AG) containing the perturbation instructions to guide the LLM on how to complete the task by perturbing the original sample at character, word, and sentence levels, respectively. Besides, we use a fidelity filter to ensure that PromptAttack maintains the original semantic meanings of the adversarial examples. Further, we enhance the attack power of PromptAttack by ensembling adversarial examples at different perturbation levels. Comprehensive empirical results using Llama2 and GPT-3.5 validate that PromptAttack consistently yields a much higher attack success rate compared to AdvGLUE and AdvGLUE++. Interesting findings include that a simple emoji can easily mislead GPT-3.5 to make wrong predictions. Our source code is available at https://github.com/GodXuxilie/PromptAttack.</div>
             </td>
           </tr>
 
@@ -183,106 +287,120 @@
           <div id="extraPublications" class="extra-publications">
           <table style="width:100%;border:0px;border-spacing:0px 15px;border-collapse:separate;margin-right:auto;margin-left:auto;"><tbody>
 
+          <!-- Publication 4: AI Search -->
           <tr>
-            <td style="padding:4px;width:100%;vertical-align:middle" class="paper-card" onclick="toggleCardAbstract(event, 'abs-aisearch')">
+            <td style="padding:4px;width:100%;vertical-align:middle" class="paper-card" role="button" tabindex="0" aria-expanded="false" onclick="toggleCardAbstract(event, 'abs-aisearch')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleCardAbstract(event, 'abs-aisearch')}">
               <a href="https://arxiv.org/abs/2506.17188" class="papertitle">Towards AI Search Paradigm</a>
               <div class="author"> Baidu Search
               </div>
               <div class="paper-actions">
                 <em>Technical Report</em>
               </div>
+              <div class="expand-hint"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
               <div class="paper-thumbnail">
-                <img src="assets/aisearch-thumbnail.png" alt="AI Search Paradigm" class="thumbnail-img">
+                <img src="assets/aisearch-thumbnail.webp" alt="AI Search Paradigm" class="thumbnail-img" width="1878" height="506" loading="lazy">
               </div>
               <div class="abstract" id="abs-aisearch">In this paper, we introduce the AI Search Paradigm, a comprehensive blueprint for next-generation search systems capable of emulating human information processing and decision-making. The paradigm employs a modular architecture of four LLM-powered agents (Master, Planner, Executor and Writer) that dynamically adapt to the full spectrum of information needs, from simple factual queries to complex multi-stage reasoning tasks. These agents collaborate dynamically through coordinated workflows to evaluate query complexity, decompose problems into executable plans, and orchestrate tool usage, task execution, and content synthesis. We systematically present key methodologies for realizing this paradigm, including task planning and tool integration, execution strategies, aligned and robust retrieval-augmented generation, and efficient LLM inference, spanning both algorithmic techniques and infrastructure-level optimizations. By providing an in-depth guide to these foundational components, this work aims to inform the development of trustworthy, adaptive, and scalable AI search systems.</div>
             </td>
           </tr>
 
+          <!-- Publication 5: GPRO -->
           <tr>
-            <td style="padding:4px;width:100%;vertical-align:middle" class="paper-card" onclick="toggleCardAbstract(event, 'abs-gpro')">
+            <td style="padding:4px;width:100%;vertical-align:middle" class="paper-card" role="button" tabindex="0" aria-expanded="false" onclick="toggleCardAbstract(event, 'abs-gpro')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleCardAbstract(event, 'abs-gpro')}">
               <a href="https://arxiv.org/abs/2601.04442" class="papertitle">Addressing Overthinking in Large Vision-Language Models via Gated Perception-Reasoning Optimization</a>
               <div class="author"> Xingjian Diao, Zheyuan Liu, Chunhui Zhang, Weiyi Wu, <span class="my-name">Keyi Kong</span>, Lin Shi, Kaize Ding, Soroush Vosoughi, Jiang Gui
               </div>
               <div class="paper-actions">
                 <em>Under Review</em>
               </div>
+              <div class="expand-hint"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
               <div class="paper-thumbnail">
-                <img src="assets/gpro-thumbnail.png" alt="AI Search Paradigm" class="thumbnail-img">
+                <img src="assets/gpro-thumbnail.webp" alt="GPRO Framework" class="thumbnail-img" width="2076" height="836" loading="lazy">
               </div>
               <div class="abstract" id="abs-gpro">Large Vision-Language Models (LVLMs) have exhibited strong reasoning capabilities through chain-of-thought mechanisms that generate step-by-step rationales. However, such slow-thinking approaches often lead to overthinking, where models produce excessively verbose responses even for simple queries, resulting in test-time inefficiency and even degraded accuracy. Prior work has attempted to mitigate this issue via adaptive reasoning strategies, but these methods largely overlook a fundamental bottleneck: visual perception failures. We argue that stable reasoning critically depends on low-level visual grounding, and that reasoning errors often originate from imperfect perception rather than insufficient deliberation. To address this limitation, we propose Gated Perception-Reasoning Optimization (GPRO), a meta-reasoning controller that dynamically routes computation among three decision paths at each generation step: a lightweight fast path, a slow perception path for re-examining visual inputs, and a slow reasoning path for internal self-reflection. To learn this distinction, we derive large-scale failure attribution supervision from approximately 790k samples, using teacher models to distinguish perceptual hallucinations from reasoning errors. We then train the controller with multi-objective reinforcement learning to optimize the trade-off between task accuracy and computational cost under uncertainty. Experiments on five benchmarks demonstrate that GPRO substantially improves both accuracy and efficiency, outperforming recent slow-thinking methods while generating significantly shorter responses.</div>
             </td>
           </tr>
 
+          <!-- Publication 6: SoundMind -->
           <tr>
-            <td style="padding:4px;width:100%;vertical-align:middle" class="paper-card" onclick="toggleCardAbstract(event, 'abs-soundmind')">
+            <td style="padding:4px;width:100%;vertical-align:middle" class="paper-card" role="button" tabindex="0" aria-expanded="false" onclick="toggleCardAbstract(event, 'abs-soundmind')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleCardAbstract(event, 'abs-soundmind')}">
               <a href="https://arxiv.org/abs/2506.12935" class="papertitle">SoundMind: RL-Incentivized Logic Reasoning for Audio-Language Models</a>
               <div class="author"> Xingjian Diao, Chunhui Zhang, <span class="my-name">Keyi Kong</span>, Weiyi Wu, Chiyu Ma, Zhongyu Ouyang, Peijun Qing, Soroush Vosoughi, Jiang Gui
               </div>
               <div class="paper-actions">
                 <em>Accepted by EMNLP 2025 (Oral presentation)</em>
               </div>
+              <div class="expand-hint"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
               <div class="paper-thumbnail">
-                <img src="assets/soundmind-thumbnail.png" alt="SoundMind Framework" class="thumbnail-img">
+                <img src="assets/soundmind-thumbnail.webp" alt="SoundMind Framework" class="thumbnail-img" width="1222" height="708" loading="lazy">
               </div>
               <div class="abstract" id="abs-soundmind">While large language models have demonstrated impressive reasoning abilities, their extension to the audio modality, particularly within large audio-language models (LALMs), remains underexplored. Addressing this gap requires a systematic approach that involves a capable base model, high-quality reasoning-oriented audio data, and effective training algorithms. In this work, we present a comprehensive solution for audio logical reasoning (ALR) tasks: we introduce SoundMind, a dataset of 6,446 audio-text annotated samples specifically curated to support complex reasoning. Building on this resource, we propose SoundMind-RL, a rule-based reinforcement learning (RL) algorithm designed to equip audio-language models with robust audio-text reasoning capabilities. By fine-tuning Qwen2.5-Omni-7B on the proposed SoundMind dataset using SoundMind-RL, we achieve strong and consistent improvements over state-of-the-art baselines on the SoundMind benchmark. This work highlights the benefit of combining high-quality, reasoning-focused datasets with specialized RL techniques, and contributes to advancing auditory intelligence in language models. The code and dataset introduced in this work are publicly available at https://github.com/xid32/SoundMind.</div>
             </td>
           </tr>
 
+          <!-- Publication 7: ProtoVQA -->
           <tr>
-            <td style="padding:4px;width:100%;vertical-align:middle" class="paper-card" onclick="toggleCardAbstract(event, 'abs-vqa')">
+            <td style="padding:4px;width:100%;vertical-align:middle" class="paper-card" role="button" tabindex="0" aria-expanded="false" onclick="toggleCardAbstract(event, 'abs-vqa')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleCardAbstract(event, 'abs-vqa')}">
               <a href="https://arxiv.org/abs/2509.16680" class="papertitle">An End-to-End Adaptable Prototypical Framework for Explainable Fine-Grained Visual Question Answering</a>
               <div class="author"> Xingjian Diao*, Weiyi Wu*,  <span class="my-name">Keyi Kong</span>, Peijun Qing, Xinwen Xu, Ming Cheng, Soroush Vosoughi, Jiang Gui
               </div>
               <div class="paper-actions">
                 <em>Accepted by EMNLP 2025 (Oral presentation)</em>
               </div>
+              <div class="expand-hint"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
               <div class="paper-thumbnail">
-                <img src="assets/vqa-thumbnail.png" alt="ProtoVQA Framework" class="thumbnail-img">
+                <img src="assets/vqa-thumbnail.webp" alt="ProtoVQA Framework" class="thumbnail-img" width="1788" height="516" loading="lazy">
               </div>
               <div class="abstract" id="abs-vqa">Visual Question Answering (VQA) is increasingly used in diverse applications ranging from general visual reasoning to safety-critical domains such as medical imaging and autonomous systems, where models must provide not only accurate answers but also explanations that humans can easily understand and verify. Prototype-based modeling has shown promise for interpretability by grounding predictions in semantically meaningful regions for purely visual reasoning tasks, yet remains underexplored in the context of VQA. We present ProtoVQA, a unified prototypical framework that (i) learns question-aware prototypes that serve as reasoning anchors, connecting answers to discriminative image regions, (ii) applies spatially constrained matching to ensure that the selected evidence is coherent and semantically relevant, and (iii) supports both answering and grounding tasks through a shared prototype backbone. To assess explanation quality, we propose the Visual-Linguistic Alignment Score (VLAS), which measures how well the model's attended regions align with ground-truth evidence. Experiments on Visual7W show that ProtoVQA yields faithful, fine-grained explanations while maintaining competitive accuracy, advancing the development of transparent and trustworthy VQA systems.</div>
             </td>
           </tr>
 
+          <!-- Publication 8: Music AVQA -->
           <tr>
-            <td style="padding:4px;width:100%;vertical-align:middle" class="paper-card" onclick="toggleCardAbstract(event, 'abs-music')">
+            <td style="padding:4px;width:100%;vertical-align:middle" class="paper-card" role="button" tabindex="0" aria-expanded="false" onclick="toggleCardAbstract(event, 'abs-music')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleCardAbstract(event, 'abs-music')}">
               <a href="https://arxiv.org/abs/2505.20638" class="papertitle">Music's Multimodal Complexity in AVQA: Why We Need More than General Multimodal LLMs</a>
               <div class="author"> Wenhao You, Xingjian Diao, Chunhui Zhang, <span class="my-name">Keyi Kong</span>, Weiyi Wu, Zhongyu Ouyang, Chiyu Ma, Tingxuan Wu, Noah Wei, Zong Ke, Ming Cheng, Soroush Vosoughi, Jiang Gui
               </div>
               <div class="paper-actions">
                 <em>Under Review</em>
               </div>
+              <div class="expand-hint"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
               <div class="paper-thumbnail">
-                <img src="assets/music-thumbnail.png" alt="Music AVQA" class="thumbnail-img">
+                <img src="assets/music-thumbnail.webp" alt="Music AVQA" class="thumbnail-img" width="2070" height="572" loading="lazy">
               </div>
               <div class="abstract" id="abs-music">While recent Multimodal Large Language Models exhibit impressive capabilities for general multimodal tasks, specialized domains like music necessitate tailored approaches. Music Audio-Visual Question Answering (Music AVQA) particularly underscores this, presenting unique challenges with its continuous, densely layered audio-visual content, intricate temporal dynamics, and the critical need for domain-specific knowledge. Through a systematic analysis of Music AVQA datasets and methods, this position paper identifies that specialized input processing, architectures incorporating dedicated spatial-temporal designs, and music-specific modeling strategies are critical for success in this domain. Our study provides valuable insights for researchers by highlighting effective design patterns empirically linked to strong performance, proposing concrete future directions for incorporating musical priors, and aiming to establish a robust foundation for advancing multimodal musical understanding. This work is intended to inspire broader attention and further research, supported by a continuously updated anonymous GitHub repository of relevant papers: https://github.com/xid32/Survey4MusicAVQA.</div>
             </td>
           </tr>
 
+          <!-- Publication 9: AgentMCD -->
           <tr>
-            <td style="padding:4px;width:100%;vertical-align:middle" class="paper-card" onclick="toggleCardAbstract(event, 'abs-controversy')">
+            <td style="padding:4px;width:100%;vertical-align:middle" class="paper-card" role="button" tabindex="0" aria-expanded="false" onclick="toggleCardAbstract(event, 'abs-controversy')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleCardAbstract(event, 'abs-controversy')}">
               <a href="https://www.ijcai.org/proceedings/2025/1107" class="papertitle">Generative Agents for Multimodal Controversy Detection</a>
               <div class="author"> Tianjiao Xu, Jinfei Gao, <span class="my-name">Keyi Kong</span>, Jianhua Yin, Tian Gao, Liqiang Nie
               </div>
               <div class="paper-actions">
                 <em>Accepted by IJCAI 2025</em>
               </div>
+              <div class="expand-hint"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
               <div class="paper-thumbnail">
-                <img src="assets/controversy-thumbnail.png" alt="AgentMCD Framework" class="thumbnail-img">
+                <img src="assets/controversy-thumbnail.webp" alt="AgentMCD Framework" class="thumbnail-img" width="1518" height="810" loading="lazy">
               </div>
               <div class="abstract" id="abs-controversy">Multimodal controversy detection, which involves determining whether a given video and its associated comments are controversial, plays a pivotal role in risk management on social video platforms. Existing methods typically provide only classification results, failing to identify what aspects are controversial and why, thereby lacking detailed explanations. To address this limitation, we propose a novel Agent-based Multimodal Controversy Detection architecture, termed AgentMCD. This architecture leverages Large Language Models (LLMs) as generative agents to simulate human behavior and improve explainability. AgentMCD employs a multi-aspect reasoning process, where multiple judges conduct evaluations from diverse perspectives to derive a final decision. Furthermore, a multi-agent simulation process is incorporated, wherein agents act as audiences, offering opinions and engaging in free discussions after watching videos. This hybrid framework enables comprehensive controversy evaluation and significantly enhances explainability. Experiments conducted on the MMCD dataset demonstrate that our proposed architecture outperforms existing LLM-based baselines in both high-resource and low-resource comment scenarios, while maintaining superior explainability.</div>
             </td>
           </tr>
 
+          <!-- Publication 10: Legal -->
           <tr>
-            <td style="padding:4px;width:100%;vertical-align:middle" class="paper-card" onclick="toggleCardAbstract(event, 'abs-legal')">
+            <td style="padding:4px;width:100%;vertical-align:middle" class="paper-card" role="button" tabindex="0" aria-expanded="false" onclick="toggleCardAbstract(event, 'abs-legal')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleCardAbstract(event, 'abs-legal')}">
               <a href="https://openreview.net/attachment?id=7Jis2yiiEZ&name=pdf" class="papertitle">Syllogistic Reasoning for Legal Judgment Analysis</a>
               <div class="author"> Wentao Deng, Jiahuan Pei, <span class="my-name">Keyi Kong</span>, Zhe Chen, Furu Wei, Yujun Li, Zhaochun Ren, Zhumin Chen, Pengjie Ren
               </div>
               <div class="paper-actions">
                 <em>Accepted by EMNLP 2023 (Oral presentation)</em>
               </div>
+              <div class="expand-hint"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>
               <div class="paper-thumbnail">
-                <img src="assets/legal-thumbnail.png" alt="Legal Judgment Framework" class="thumbnail-img">
+                <img src="assets/legal-thumbnail.webp" alt="Legal Judgment Framework" class="thumbnail-img" width="1546" height="646" loading="lazy">
               </div>
               <div class="abstract" id="abs-legal">Legal judgment assistants are developing fast due to impressive progress of large language models (LLMs). However, people can hardly trust the results generated by a model without reliable analysis of legal judgement. For legal practitioners, it is common practice to utilize syllogistic reasoning to select and evaluate the arguments of the parties as part of the legal decision-making process. But the development of syllogistic reasoning for legal judgment analysis is hindered by the lack of resources: (1) there is no large-scale syllogistic reasoning dataset for legal judgment analysis, and (2) there is no set of established benchmarks for legal judgment analysis. In this paper, we construct and manually correct a syllogistic reasoning dataset for legal judgment analysis. The dataset contains 11,239 criminal cases which cover 4 criminal elements, 80 charges and 124 articles. We also select a set of large language models as benchmarks, and conduct an in-depth analysis of the capacity of their legal judgment analysis.</div>
             </td>
@@ -301,8 +419,8 @@
           </tbody></table>
 
           <div class="experience-container">
-            <div class="experience-card">
-              <img src="assets/baidu-logo.png" alt="Baidu" class="experience-logo">
+            <div class="experience-card reveal-card">
+              <img src="assets/baidu-logo.webp" alt="Baidu" class="experience-logo" width="80" height="80">
               <div class="experience-content">
                 <div class="experience-title">Baidu Search</div>
                 <div class="experience-date">Nov 2024 - Nov 2025</div>
@@ -310,8 +428,8 @@
               </div>
             </div>
 
-            <div class="experience-card">
-              <img src="assets/nus-logo.png" alt="NUS" class="experience-logo">
+            <div class="experience-card reveal-card">
+              <img src="assets/nus-logo.webp" alt="NUS" class="experience-logo" width="80" height="80">
               <div class="experience-content">
                 <div class="experience-title">National University of Singapore</div>
                 <div class="experience-date">Jul 2024 - Sep 2024</div>
@@ -319,8 +437,8 @@
               </div>
             </div>
 
-            <div class="experience-card">
-              <img src="assets/sdu-logo.png" alt="SDU" class="experience-logo">
+            <div class="experience-card reveal-card">
+              <img src="assets/sdu-logo.webp" alt="SDU" class="experience-logo" width="80" height="80">
               <div class="experience-content">
                 <div class="experience-title">Shandong University</div>
                 <div class="experience-date">Sep 2023 - May 2024</div>
@@ -339,10 +457,10 @@
           </tbody></table>
 
           <div class="education-container">
-            <div class="education-card">
+            <div class="education-card reveal-card">
               <div class="education-logos">
-                <img src="assets/sdu-logo.png" alt="SDU" class="education-logo">
-                <img src="assets/taishan-logo.png" alt="Taishan College" class="education-logo">
+                <img src="assets/sdu-logo.webp" alt="SDU" class="education-logo" width="80" height="80">
+                <img src="assets/taishan-logo.webp" alt="Taishan College" class="education-logo" width="80" height="80">
               </div>
               <div class="education-content">
                 <div class="education-title">Shandong University, Taishan (Honors) College</div>
@@ -362,7 +480,7 @@
           </tbody></table>
 
           <div class="awards-container">
-            <div class="award-card">
+            <div class="award-card reveal-card">
               <div class="award-content">
                 <div class="award-title">ICPC Asia Regional Contest</div>
                 <div class="award-date">Nov 2023</div>
@@ -370,7 +488,7 @@
               </div>
             </div>
 
-            <div class="award-card">
+            <div class="award-card reveal-card">
               <div class="award-content">
                 <div class="award-title">Shandong Provincial Programming Contest</div>
                 <div class="award-date">May 2024</div>
@@ -378,7 +496,7 @@
               </div>
             </div>
 
-            <div class="award-card">
+            <div class="award-card reveal-card">
               <div class="award-content">
                 <div class="award-title">CCPC National Invitational Contest (Shandong)</div>
                 <div class="award-date">May 2024</div>
@@ -397,14 +515,14 @@
           </tbody></table>
 
           <div class="services-container">
-            <div class="service-card">
+            <div class="service-card reveal-card">
               <div class="service-content">
                 <div class="service-title">Conference Reviewer</div>
                 <div class="service-list">AAAI (2026), ACL (2025), AISTATS (2025-2026), EMNLP (2025), ICLR (2025-2026), ICML (2025), NeurIPS (2024-2025)</div>
               </div>
             </div>
           </div>
-          
+
           <!-- Footer -->
           <table style="width:100%;border:0px;border-spacing:0px;border-collapse:separate;margin-right:auto;margin-left:auto;"><tbody>
             <tr>
@@ -418,6 +536,13 @@
         </td>
       </tr>
     </tbody></table>
+
+    <!-- Back to Top Button -->
+    <button id="backToTop" class="back-to-top" aria-label="Back to top" title="Back to top">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 15l-6-6-6 6"/>
+      </svg>
+    </button>
 
   </body>
 </html>
